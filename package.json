@@ -1,0 +1,22 @@
+{
+   "devDependencies": {
+      "@types/node": "^26.6.6",
+      "tsx": "^4.23.15",
+      "typescript": "^7.0.2"
+   },
+   "name": "gator",
+   "version": "1.0.0",
+   "description": "1. Clone the repository and navigate to the project's directory:",
+   "main": "index.js",
+   "dependencies": {
+      "undici-types": "^8.9.0"
+   },
+   "type": "module",
+   "scripts": {
+      "start": "node ./dist/index.js",
+      "dev": "tsc && node ./dist/index.js"
+   },
+   "keywords": [],
+   "author": "",
+   "license": "ISC"
+}
