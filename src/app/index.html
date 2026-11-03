@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Alerts</title>
+      <style>
+         body {
+            font-family: system-ui, sans-serif;
+            background: #111;
+            color: #eee;
+            margin: 2rem;
+         }
+         h1 {
+            margin-bottom: 0.25rem;
+         }
+         #status {
+            color: #888;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+         }
+         table {
+            width: 100%;
+            border-collapse: collapse;
+         }
+         th,
+         td {
+            text-align: left;
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid #333;
+         }
+         th {
+            color: #888;
+            font-weight: 500;
+         }
+         .level {
+            font-weight: 600;
+         }
+         .low {
+            color: #8fbf8f;
+         }
+         .medium {
+            color: #e0a040;
+         }
+         .high {
+            color: #ff6060;
+         }
+      </style>
+   </head>
+   <body>
+      <h1>Alerts</h1>
+      <div id="status">Loading…</div>
+      <table>
+         <thead>
+            <tr>
+               <th>Time</th>
+               <th>Agent</th>
+               <th>Description</th>
+               <th>Level</th>
+               <th>Rule</th>
+            </tr>
+         </thead>
+         <tbody id="rows"></tbody>
+      </table>
+
+      <script>
+         function levelClass(level) {
+            if (level >= 10) return "high";
+            if (level >= 7) return "medium";
+            return "low";
+         }
+
+         async function load() {
+            const status = document.getElementById("status");
+            try {
+               const res = await fetch("/api/alerts");
+               if (!res.ok) throw new Error("Server returned " + res.status);
+               const alerts = await res.json();
+
+               const body = document.getElementById("rows");
+               body.replaceChildren();
+
+               for (const a of alerts) {
+                  const tr = document.createElement("tr");
+                  const cells = [
+                     new Date(a.time).toLocaleString(),
+                     a.agent ?? "-",
+                     a.description ?? "-",
+                     a.level ?? "-",
+                     a.ruleId ?? "-",
+                  ];
+                  cells.forEach((text, i) => {
+                     const td = document.createElement("td");
+                     td.textContent = text;
+                     if (i === 3) td.className = "level " + levelClass(a.level);
+                     tr.appendChild(td);
+                  });
+                  body.appendChild(tr);
+               }
+               status.textContent =
+                  "Updated " + new Date().toLocaleTimeString();
+            } catch (err) {
+               status.textContent = "Error: " + err.message;
+            }
+         }
+
+         load();
+         setInterval(load, 5000);
+      </script>
+   </body>
+</html>
